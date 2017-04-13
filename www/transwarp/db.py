@@ -317,7 +317,7 @@ def _update(sql, *args):
         cursor = _db_ctx.connection.cursor()
         cursor.execute(sql, args)
         r = cursor.rowcount
-        if _db_ctx.transactions == 0:
+        if _db_ctx.transaction == 0:
             # no transaction enviroment
             logging.info('auto commit')
             _db_ctx.connection.commit()
@@ -518,8 +518,7 @@ class _TransactionCtx(object):
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
-    create_engine('www-data', 'www-data', 'test', '192.168.10.128')
+    create_engine('root', '2356169', 'test', '127.0.0.1')
     update('drop table if exists user')
     update('create table user (id int primary key, name text, email text, passwd text, last_modified real)')
-    import doctest
-    doctest.testmod()
+  
