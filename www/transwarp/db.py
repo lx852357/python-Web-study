@@ -46,8 +46,28 @@
       3. 支持事物
          transaction 函数封装了如下功能:
              1. 事务也可以嵌套，内层事务会自动合并到外层事务中，这种事务模型足够满足99%的需求
+"""
 
 """
+数据库无封装连接过程:
+
+    1、 获取一个数据库连接对象
+    conn = mysqlmysql.connector.connect(user='root', password='password', database='test', use_unicode=True)
+
+    2、从数据库连接对象conn中获取一个游标对象cusor
+    cursor = conn.cursor()
+
+    3、执行操作，是由cursor执行的操作，操作包括插入，查询，创建表等等
+    cursor.execute('xxxxxxx')
+
+    4、提交事务，是由数据库连接对象conn执行
+    conn.commit()
+
+    5、关闭游标
+    cursor.close()
+"""
+
+
 import time
 import uuid
 import functools
@@ -142,6 +162,7 @@ def with_connection(func):
             f3()
     """
 
+    #  这个with语句里，在执行顺序 enter --> return func --> exit
     @functools.wraps(func)
     def _wrapper(*args, **kw):
         with _ConnectionCtx():
@@ -370,6 +391,8 @@ def insert(table, **kw):
     """
     cols, args = zip(*kw.iteritems())
     sql = 'insert into `%s` (%s) values (%s)' % (table, ','.join(['`%s`' % col for col in cols]), ','.join(['?' for i in range(len(cols))]))
+    #  执行结果：insert into `table` (`passwd`,`last_modified`,`id`,`name`,`email`) values (?,?,?,?,?)
+    #  这里把args作为元组参数加入了_update函数里去了
     return _update(sql, *args)
 
 
